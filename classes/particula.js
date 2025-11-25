@@ -1,44 +1,57 @@
 class Particula {
-	constructor(_x, _y) {
-		this.pos = createVector(_x, _y);
+  constructor(_x, _y) {
+    this.pos = createVector(_x, _y);
 
-		this.vel = p5.Vector.random2D();
-		this.vel.setMag(random(0.5, 2));
+    // Velocidad normal (no tan suave, no tan rápida)
+    this.vel = p5.Vector.random2D().setMag(random(0.8, 1.8));
 
-		this.tVida = int(random(100, 300));
-		this.tVidaInicial = this.tVida;
-		this.estaMuerta = false;
-		this.diam = random(10, 30);
-		this.gravedad = createVector(0, 0.98);
+    this.tVida = int(random(80, 200));
+    this.tVidaInicial = this.tVida;
+    this.estaMuerta = false;
 
-		this.velAngula = random(-0.1, 0.1);
+    this.diam = random(8, 22);
 
-		this.c = color(random(200, 255), random(100, 150), random(0, 255));
+    // Caída normal
+    this.gravedad = createVector(0, 0.12);
 
-		// console.log('Hola, estoy viva');
-	}
+    // Rotación leve
+    this.velAngula = random(-0.03, 0.03);
+  }
 
-	update() {
-		if (!this.estaMuerta) {
-			this.vel.add(this.gravedad);
-			this.vel.normalize();
-			this.vel.setMag(3);
-			this.vel.rotate(this.velAngula);
-			this.tVida -= 1;
-			this.pos.add(this.vel);
-		}
+  update() {
+    if (!this.estaMuerta) {
 
-		if (this.tVida <= 0 && !this.estaMuerta) {
-			// console.log('Uuuups, me morí :(');
-			this.estaMuerta = true;
-		}
-	}
-	display() {
-		fill(this.c);
-		noStroke();
+      // Caída con peso normal
+      this.vel.add(this.gravedad);
 
-		this.diamFinal = map(this.tVida, this.tVidaInicial, 0, this.diam, 0);
+      // Rotación leve
+      this.vel.rotate(this.velAngula);
 
-		circle(this.pos.x, this.pos.y, this.diamFinal);
-	}
+      // Movimiento final
+      this.pos.add(this.vel);
+
+      this.tVida--;
+      if (this.tVida <= 0) this.estaMuerta = true;
+    }
+  }
+
+  display() {
+    push();
+    noStroke();
+
+    // Glow blanco
+    if (this.diam > 4) {
+      drawingContext.shadowBlur = 25;
+      drawingContext.shadowColor = "white";
+    } else {
+      drawingContext.shadowBlur = 0;
+    }
+
+    let diamFinal = map(this.tVida, this.tVidaInicial, 0, this.diam, 0);
+
+    fill(255);
+    circle(this.pos.x, this.pos.y, diamFinal);
+    pop();
+  }
 }
+
